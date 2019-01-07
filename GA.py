@@ -43,7 +43,7 @@ toolbox = base.Toolbox()
 toolbox.register("attr_bool", random.randint, 0, 1)
 ##toolbox.attr_boolを100回繰り返し(Repeat)てえられるリストを個体(Individual)の属性とする。
 toolbox.register("individual", tools.initRepeat, creator.Individual, 
-    toolbox.attr_bool, 10)
+    toolbox.attr_bool, 6)
 #個体の集合をpopulationとする。
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
@@ -68,13 +68,12 @@ toolbox.register("select", tools.selTournament, tournsize=5)
 #----------
 
 def main():
-    random.seed(64)
-    pop = toolbox.population(n=30)
+    random.seed(60)
+    pop = toolbox.population(n=5)
     CXPB, MUTPB = 0.5, 0.2
     
     print("Start of evolution")
     fitnesses = list(map(toolbox.evaluate, pop))
-    print(fitnesses)
     for ind, fit in zip(pop, fitnesses):
         ind.fitness.values = fit
     
@@ -87,16 +86,18 @@ def main():
     g = 0
     
     # Begin the evolution
-    while g < 5:
+    while g < 1:
         # A new generation
         g = g + 1
         print("-- Generation %i --" % g)
         
         # Select the next generation individuals
         offspring = toolbox.select(pop, len(pop))
+        print(offspring)
         # Clone the selected individuals
         offspring = list(map(toolbox.clone, offspring))
-    
+        #offspring2 = [toolbox.clone(ind) for ind in (offspring,offspring)]
+        print(offspring)
         # Apply crossover and mutation on the offspring
         for child1, child2 in zip(offspring[::2], offspring[1::2]):
 
@@ -118,7 +119,6 @@ def main():
     
         # Evaluate the individuals with an invalid fitness
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-        print(invalid_ind[0]) 
         fitnesses = map(toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
@@ -131,7 +131,6 @@ def main():
         
         # Gather all the fitnesses in one list and print the stats
         fits = [ind.fitness.values[0] for ind in pop]
-        print(fits)
         length = len(pop)
         mean = sum(fits) / length
         sum2 = sum(x*x for x in fits)
